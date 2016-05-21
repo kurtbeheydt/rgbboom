@@ -32,7 +32,7 @@ bool blueActive = true;
 int patterns[] = {PATTERN_FADE, PATTERN_FIX, PATTERN_BLINK, PATTERN_BLINKFAST, PATTERN_BLINKSUPERFAST};
 int patternStep = 0;
 int patternDirection;
-int patternPrevTime;
+unsigned long patternPrevTime;
 int currentPattern = 0;
 
 void setup() {
@@ -51,10 +51,8 @@ void setup() {
     Serial.print(" max; ");
     Serial.println(sensorMax[i]);
   }
-
-  patternPrevTime = millis();
   
-  delay(500);
+  delay(10);
 }
 
 void loop() {
@@ -93,7 +91,7 @@ void ledBlink(int blinkDelay) {
   unsigned long currentMillis = millis();
   
   if (currentMillis > (patternPrevTime + blinkDelay)) {
-    patternStep = (patternStep > 240) ? 0 : 245;
+    patternStep = (patternStep > 20) ? 0 : 50;
     patternPrevTime = millis();
   }
   
@@ -176,12 +174,13 @@ boolean detectSensor(int sensor) {
       } else if (sensor == 2) {
         blueActive = 1 - blueActive;
       } else if (sensor == 3) {
-        if ((currentPattern + 1) < sizeof(patterns)) {
+        patternPrevTime = millis();
+        if ((currentPattern + 1) < (sizeof(patterns)/sizeof(int))) {
           currentPattern++;
         } else {
           currentPattern = 0;
         }
-        Serial.println(currentPattern);
+        Serial.println((currentPattern));
       }
 
       Serial.print("Sensor ");
